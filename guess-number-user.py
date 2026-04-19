@@ -11,8 +11,8 @@ def main():
             print("Please, enter a valid integer!")
             continue
 
-        if user_number < 0:
-            print("Please, enter a non-negative number!")
+        if user_number < 0 or user_number > 100:
+            print("Please, enter a number in the range from 0 to 100.")
             continue
         
         if user_number == number:
