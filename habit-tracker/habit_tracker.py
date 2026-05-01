@@ -44,9 +44,7 @@ def load_habits():
 
 
 def display_all_habits(habs):
-    if not habs:
-        print("There are not habits present.")
-        time.sleep(2)
+    if no_habit_present(habs):
         return
     
     for count, habit in enumerate(habs.keys(), 1):
@@ -54,14 +52,37 @@ def display_all_habits(habs):
     time.sleep(2.5)
 
 
-def display_habit():
-    ...
+def display_habit(habs):
+    if no_habit_present(habs):
+        return 
+    
+    hab_to_display = is_hab_present(habs)
+    year, month = get_year_month()
+ 
+    cal = c.TextCalendar()
+    weeks = cal.monthdayscalendar(year, month)
+
+    print(c.month_name[month], year)
+    print("Mo Tu We Th Fr Sa Su")
+    for week in weeks:
+        for day in week:
+            if day == 0:
+                print(" ", end=" ")
+                continue
+
+            date_str = f"{month:02d}-{day:02d}-{year}"
+
+            if date_str in habs[hab_to_display]:
+                print("X", end=" ")
+            else:
+                print(f"{day:2}", end=" ")
+
+        print()
+    time.sleep(3)
 
 
 def update_habit(habs):
-    if not habs:
-        print("There are not habits present.")
-        time.sleep(2)
+    if no_habit_present(habs):
         return
 
     hab_to_update = is_hab_present(habs)
@@ -79,17 +100,17 @@ def update_habit(habs):
 
         try:
             valid_date = dt.datetime.strptime(hab_date, "%m-%d-%Y")
-        except:
+        except ValueError:
             print("Invalid date format.")
             time.sleep(2)
             continue
 
-        habs[hab_to_update].append(valid_date)
+        formatted_date = valid_date.strftime("%m-%d-%Y")
+        habs[hab_to_update].append(formatted_date)
 
     
 def add_habit(habs) -> None:
     new_habit_str = get_habit()
-    new_habit = {new_habit_str : {}}
 
     while True:
         did_today = input("Did you do the new habit today (Yes/No)?\n-> ").strip().lower()
@@ -111,16 +132,13 @@ def add_habit(habs) -> None:
 
 
 def remove_habit(habs):
-    if not habs:
-        print("There are not habits present.")
-        time.sleep(2)
+    if no_habit_present(habs):
         return
-    
-    hab_to_del = is_hab_present()
+
+    hab_to_del = is_hab_present(habs)
 
     del habs[hab_to_del]
     print("Habit has been deleted!")
-    return
 
 
 def save_habits(habs):
@@ -144,9 +162,15 @@ def get_habit():
     while True:
         user_habit = input("Enter a habit: ").strip().lower()
 
+        if not user_habit:
+            print("Habit cannot be empty.")
+            time.sleep(2)
+            continue
+
         if not all(char.isalnum() or char.isspace() for char in user_habit):
             print("Habits can only contain letters, numbers or spaces.")
             time.sleep(2)
+            continue
 
         return user_habit
     
@@ -161,6 +185,45 @@ def is_hab_present(habs):
             continue
 
         return habit
+    
+
+def get_year_month():
+    while True:
+        year = input("Enter the year: ")
+
+        if len(year) != 4:
+            print("Use a 4-digit year.")
+            time.sleep(2)
+            continue
+
+        try:
+            year = int(year)
+        except ValueError:
+            print("Use a 4-digit year.")
+            time.sleep(2)
+            continue
+
+        try:
+            month = int(input("Enter the month as a number: "))
+        except ValueError:
+            print("Enter the month as a number")
+            time.sleep(2)
+            continue
+
+        if not 1 <= month <= 12:
+            print("Month does not exist. Make sure it is between 1 and 12.")
+            time.sleep(2)
+            continue
+            
+        return (year, month)
+    
+
+def no_habit_present(habs):
+    if not habs:
+        print("There are not habits present.")
+        time.sleep(2)
+        return True
+    return False
     
 
 if __name__ == "__main__":
