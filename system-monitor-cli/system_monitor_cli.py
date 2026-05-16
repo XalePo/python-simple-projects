@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict
 import psutil
 import time
 
@@ -16,7 +16,7 @@ def main():
 
 
 def get_cpu_usage() -> float:
-    return f"{psutil.cpu_percent(interval=1)}"
+    return psutil.cpu_percent(interval=1)
 
 
 def get_memory_usage() -> Dict:
@@ -46,8 +46,11 @@ def get_disk_usage() -> Dict:
     }
 
 
-def get_battery_percentage() -> int:
+def get_battery_percentage() -> float | str:
     battery = psutil.sensors_battery()
+
+    if battery is None:
+        return "Not available"
 
     return battery.percent
 
@@ -66,30 +69,34 @@ def get_sys_uptime() -> Dict:
     }
 
 
-def bytes_to_gigabytes(byte_val) -> Tuple[float, ...]:
-        return round(byte_val / 1073741824, 2)
+def bytes_to_gigabytes(byte_val) -> float:
+    return round(byte_val / 1073741824, 2)
 
 
 def display_report(sys_info) -> None:
-    print("Sytem Monitoring Report")
+    print("System Monitoring Report")
     print("-----------------------")
-    print(f"CPU Usage: {sys_info["cpu"]}%")
+    print(f"CPU Usage: {sys_info['cpu']}%")
 
     print("\nMemory:")
-    print(f"Total: {sys_info["memory"]["total"]} GB")
-    print(f"Used: {sys_info["memory"]["used"]} GB")
-    print(f"Available: {sys_info["memory"]["available"]} GB")
-    print(f"Free: {sys_info["memory"]["free"]} GB")
-    print(f"Usage: {sys_info["memory"]["percent"]}%")
+    print(f"Total: {sys_info['memory']['total']} GB")
+    print(f"Used: {sys_info['memory']['used']} GB")
+    print(f"Available: {sys_info['memory']['available']} GB")
+    print(f"Free: {sys_info['memory']['free']} GB")
+    print(f"Usage: {sys_info['memory']['percent']}%")
 
-    print("\nDisk")
-    print(f"Total: {sys_info["disk"]["total"]} GB")
-    print(f"Used: {sys_info["disk"]["used"]} GB")
-    print(f"Free: {sys_info["disk"]["free"]} GB")
-    print(f"Usage: {sys_info["disk"]["percent"]}")
+    print("\nDisk:")
+    print(f"Total: {sys_info['disk']['total']} GB")
+    print(f"Used: {sys_info['disk']['used']} GB")
+    print(f"Free: {sys_info['disk']['free']} GB")
+    print(f"Usage: {sys_info['disk']['percent']}%")
 
-    print(f"\nBattery: {sys_info["battery"]}%")
-    print(f"System Uptime: {sys_info["sys_uptime"]["hours"]} hours and {sys_info["sys_uptime"]["minutes"]} minutes")
+    battery = sys_info["battery"]
+    if isinstance(battery, str):
+        print(f"\nBattery: {battery}")
+    else:
+        print(f"\nBattery: {battery}%")
+    print(f"System Uptime: {sys_info['sys_uptime']['hours']} hours and {sys_info['sys_uptime']['minutes']} minutes")
 
 
 if __name__ == "__main__":
