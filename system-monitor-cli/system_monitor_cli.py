@@ -3,15 +3,13 @@ from typing import Tuple
 
 
 def main():
-    system_info = {
-        "cpu": get_cpu_usage(),
-        "memory": get_memory_usage(),
-        "disk": get_disk_usage(),
-        "battery": get_battery_percentage(),
-        "system": get_system_uptime(),
-    }
-
-    display_report(system_info)
+    cpu_usage = get_cpu_usage()
+    mem_total, mem_available, mem_used, mem_free, mem_perc = get_memory_usage()
+    disk_total, disk_used, disk_free, disk_perc = get_disk_usage()
+    battery_perc = get_battery_percentage()
+    sys_uptime = get_sys_uptime()
+    
+    print()
 
 
 def get_cpu_usage():
@@ -20,28 +18,23 @@ def get_cpu_usage():
 
 def get_memory_usage():
     mem = psutil.virtual_memory()
-    mem_total, mem_available, mem_perc, mem_used, mem_free, *_ = mem
-
-    mem_data = tuple(map(bytes_to_gigabytes, (mem_total, mem_available, mem_used, mem_free))) 
-
-    return mem_data + (mem_perc,)
+    
+    return (*map(bytes_to_gigabytes, (mem.total, mem.available, mem.used, mem.free)), mem.percent)
 
 
 def get_disk_usage():
-    disk = psutil.disk_usage("/")
-    disk_total, disk_used, disk_free, disk_perc = disk
-
-    disk_data = tuple(map(bytes_to_gigabytes, (disk_total, disk_used, disk_free,)))
-
-    return disk_data + (disk_perc,)
+    disk = psutil.disk_usage("/System/Volumes/Data")
+    print(disk)
+    
+    return (*map(bytes_to_gigabytes, (disk.total, disk.used, disk.free)), disk.percent)
 
 
 def get_battery_percentage():
-    ...
+    pass
 
 
-def get_system_uptime():
-    ...
+def get_sys_uptime():
+    pass
 
 
 def bytes_to_gigabytes(byte_val) -> Tuple[float, ...]:
@@ -49,9 +42,9 @@ def bytes_to_gigabytes(byte_val) -> Tuple[float, ...]:
 
 
 def display_report(system_info) -> None:
-    print(system_info["cpu"])
-    print(system_info["memory"])
-    print(system_info["disk"])
+    pass
+
+
 if __name__ == "__main__":
     main()
 
